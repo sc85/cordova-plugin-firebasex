@@ -47,6 +47,7 @@ public class FirebasePluginMessagingService extends FirebaseMessagingService {
             super.onNewToken(refreshedToken);
             Log.d(TAG, "Refreshed token: " + refreshedToken);
             FirebasePlugin.sendToken(refreshedToken);
+            intercomPushClient.sendTokenToIntercom(getApplication(), refreshedToken);
         }catch (Exception e){
             FirebasePlugin.handleExceptionWithoutContext(e);
         }
