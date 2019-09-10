@@ -24,9 +24,13 @@ import com.google.firebase.messaging.RemoteMessage;
 import java.util.Map;
 import java.util.Random;
 
+import io.intercom.android.sdk.push.IntercomPushClient;
+
 public class FirebasePluginMessagingService extends FirebaseMessagingService {
 
     private static final String TAG = "FirebasePlugin";
+
+    private final IntercomPushClient intercomPushClient = new IntercomPushClient();
 
     static final String defaultSmallIconName = "notification_icon";
     static final String defaultLargeIconName = "notification_icon_large";
@@ -70,6 +74,13 @@ public class FirebasePluginMessagingService extends FirebaseMessagingService {
             // and data payloads are treated as notification messages. The Firebase console always sends notification
             // messages. For more see: https://firebase.google.com/docs/cloud-messaging/concept-options
             // [END_EXCLUDE]
+
+            // Check if message needs to be handled by Intercom
+            Map message = remoteMessage.getData();
+            if (intercomPushClient.isIntercomPush(message)) {
+                intercomPushClient.handlePush(getApplication(), message);
+                return;
+            }
 
             // Pass the message to the receiver manager so any registered receivers can decide to handle it
             boolean wasHandled = FirebasePluginMessageReceiverManager.onMessageReceived(remoteMessage);
